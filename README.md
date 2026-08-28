@@ -1,37 +1,50 @@
-# 🎉 Otopilot Birthday Tracker
+# Birthday Tracker
 
-Bu proje, F/P (Fiyat/Performans) mantığıyla tasarlanmış, tamamen otopilot çalışan, şifre korumalı ve modern (Glassmorphism & Synthwave) arayüzlü bir **Doğum Günü Hatırlatma Sistemi**dir.
+A lightweight, serverless web application that helps users track birthdays and sends automated email reminders. Built with Python (Flask) and Vanilla JavaScript.
 
-## 🚀 Özellikler
-- **Kimlik Doğrulama (Auth):** Her e-posta adresi kendi özel şifresiyle sisteme giriş yapar. Şifreler `werkzeug.security` kullanılarak güvenli bir şekilde hash'lenir (kriptolanır). Başkaları sizin mailinizi bilse bile verilerinize erişemez.
-- **Otopilot Bildirimler:** Projeyi lokalde çalıştırdığınızda (veya bir sunucuya yüklediğinizde), arka planda çalışan `APScheduler` her gün saat 00:00 ve 07:00'da veritabanını tarar ve o gün doğum günü olan kişileri, kullanıcının mail adresine bildirir.
-- **Dinamik Takvim:** Liste görünümü yerine Vanilla JS ile sıfırdan yazılmış interaktif bir takvim kullanılır.
-- **Synthwave Tema:** Neon Mor, Pembe ve Turuncu renk tonlarıyla karanlık modun mükemmel uyumu.
+## Features
+- **Secure Authentication:** Multi-user support with hashed passwords using `werkzeug.security`.
+- **Automated Email Reminders:** Designed to run in a serverless environment. An external cron job triggers daily checks and sends email notifications.
+- **Dynamic Calendar UI:** A fully custom, interactive calendar built with Vanilla JS (no heavy frontend frameworks).
+- **Smart Calculations:** Automatically calculates the person's upcoming age and determines their Zodiac sign based on their birth date.
+- **Customizable Alerts:** Users can configure their notification preferences (e.g., Same day, 1 day before, 1 week before).
 
-## ⚙️ Kurulum (Nasıl Çalıştırılır?)
+## Tech Stack
+- **Backend:** Python, Flask
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Data Storage:** JSON (File-based, designed for lightweight deployments)
 
-Bu projeyi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin.
+## Installation & Setup
 
-### 1. Gereksinimleri Yükleyin
-Proje Python ve Flask ile çalışır. Terminalde (veya Komut İsteminde) aşağıdaki kütüphaneleri yükleyin:
+### 1. Requirements
+Ensure you have Python installed. Install the required dependencies using pip:
 ```bash
-pip install flask apscheduler python-dotenv werkzeug
+pip install flask python-dotenv werkzeug
 ```
 
-### 2. Ortam Değişkenlerini (Postane) Ayarlayın
-Proje ana dizininde bir `.env` dosyası oluşturun (Bu dosya güvenlik sebebiyle GitHub'da yoktur). İçine şu bilgileri girin:
+### 2. Environment Variables
+Create a `.env` file in the root directory and configure the following variables:
 ```env
-EMAIL_ADDRESS=senin_bot_hesabin@gmail.com
-EMAIL_PASSWORD=16_haneli_uygulama_sifresi
+EMAIL_ADDRESS=your_bot_email@gmail.com
+EMAIL_PASSWORD=your_16_char_app_password
+CRON_SECRET=your_secure_cron_trigger_key
 ```
-*(Not: Gmail kullanıyorsanız, Google hesap ayarlarından 2-Adımlı Doğrulamayı açıp bir **Uygulama Şifresi** almanız gerekmektedir).*
+*(Note: If using Gmail, you must generate an "App Password" from your Google Account security settings).*
 
-### 3. Uygulamayı Başlatın
-Terminal üzerinden uygulamayı başlatın:
+### 3. Running Locally
+Start the Flask development server:
 ```bash
 python app.py
 ```
-Tarayıcınızdan `http://127.0.0.1:5000` adresine gidin. E-posta adresinizi girin, kendinize bir şifre belirleyin ve takviminizi oluşturmaya başlayın!
+Visit `http://127.0.0.1:5000` in your browser to access the application.
+
+## Serverless Deployment (Cloud Cron)
+This application is designed to be hosted on platforms like PythonAnywhere. Instead of running a continuous background scheduler (which consumes resources), it exposes a secure endpoint for external triggers.
+
+To trigger the daily email checks, set up a free external cron service (like cron-job.org) to hit the following endpoint every day at 00:00:
+```
+GET https://your-domain.com/api/run_cron?key=your_secure_cron_trigger_key
+```
 
 ---
-**Mimari ve Tasarım:** Kaan Ardal & Ekko (AI)
+**Creator:** Darkeas
