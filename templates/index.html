@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+    <!-- Karşılama Ekranı (Auth) -->
+    <div id="welcome-screen" class="glass-container active" style="max-width: 500px;">
+        <header>
+            <div class="logo">
+                <span class="neon-dot"></span>
+                <h1>Birthday Tracker</h1>
+            </div>
+            <p class="subtitle">Otopilot Bildirim Sistemi</p>
+        </header>
+
+        <!-- Email Adımı -->
+        <form id="email-form">
+            <p style="font-size:14px; margin-bottom:20px; text-align:center; color:var(--text-main);">
+                Sisteme girmek için e-posta adresinizi yazın:
+            </p>
+            <div class="input-group">
+                <input type="email" id="user-email" placeholder="ornek@gmail.com" required autocomplete="email">
+            </div>
+            <button type="submit" class="gradient-btn" id="check-email-btn">
+                <span>Devam Et</span>
+            </button>
+        </form>
+
+        <!-- Şifre Adımı (Gizli) -->
+        <form id="password-form" class="hidden">
+            <p id="auth-message" style="font-size:14px; margin-bottom:20px; text-align:center; color:var(--text-main);"></p>
+            
+            <div class="input-group">
+                <input type="password" id="user-password" placeholder="Şifreniz" required>
+            </div>
+            
+            <div class="input-group hidden" id="confirm-password-group">
+                <input type="password" id="user-password-confirm" placeholder="Şifrenizi Tekrar Girin">
+            </div>
+            
+            <p id="auth-error" style="color: var(--danger); font-size: 13px; text-align: center; margin-top: -5px;"></p>
+
+            <div style="display:flex; gap:10px;">
+                <button type="button" id="back-btn" class="gradient-btn" style="flex:1; background:transparent; border:1px solid var(--surface-border); box-shadow:none;">Geri</button>
+                <button type="submit" class="gradient-btn" id="auth-submit-btn" style="flex:2;">
+                    <span>Giriş Yap</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Dashboard Ekranı -->
+    <div id="app-screen" class="dashboard-layout hidden">
+        
+        <!-- Sol Panel: Hızlı Ekleme ve Liste -->
+        <aside class="left-panel glass-container">
+            <header style="margin-bottom: 25px; text-align: left;">
+                <div class="logo" style="justify-content: flex-start;">
+                    <span class="neon-dot"></span>
+                    <h1 style="font-size:22px;">Birthday Tracker</h1>
+                </div>
+                <div style="font-size: 12px; color: var(--text-main); margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div>Hesap: <span id="display-email" style="color:var(--text-white); font-weight:600;"></span></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <select id="global-reminder" style="background:rgba(0,0,0,0.5); color:var(--text-white); border:1px solid var(--surface-border); padding:4px 8px; border-radius:6px; font-family:inherit; font-size:12px; cursor:pointer; outline:none;">
+                            <option value="0">Bildirim: Aynı Gün</option>
+                            <option value="1">Bildirim: 1 Gün Önce</option>
+                            <option value="3">Bildirim: 3 Gün Önce</option>
+                            <option value="7">Bildirim: 1 Hafta Önce</option>
+                        </select>
+                        <button id="logout-btn" class="text-btn" style="margin-left:auto;">Çıkış Yap</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="form-container" style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px; color:var(--text-white); font-weight:600; font-size:16px;">Kişi Ekle</h3>
+                <form id="birthday-form">
+                    <div class="input-group">
+                        <input type="text" id="name" placeholder="İsim" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <input type="date" id="date" required>
+                    </div>
+                    <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 5px;">
+                        <span>Kaydet</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="list-container">
+                <h3 style="margin-bottom: 12px; color:var(--text-white); font-weight:600; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Sıradakiler</span>
+                    <span style="font-size:11px; color:var(--text-main); font-weight:400;">Yaklaşan 5 Doğum Günü</span>
+                </h3>
+                <ul id="upcoming-list" style="list-style: none; display:flex; flex-direction:column; gap:8px;">
+                    <!-- JS will inject items here -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Sağ Panel: Takvim -->
+        <main class="right-panel glass-container">
+            <div class="calendar-controls">
+                <button id="prev-month" class="icon-btn">&lsaquo;</button>
+                <h2 id="month-year-display">Eylül 2026</h2>
+                <button id="next-month" class="icon-btn">&rsaquo;</button>
+            </div>
+
+            <div class="calendar">
+                <div class="weekdays">
+                    <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
+                </div>
+                <div id="calendar-grid" class="days-grid">
+                    <!-- Javascript will generate days here -->
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

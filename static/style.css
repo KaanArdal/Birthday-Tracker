@@ -1,0 +1,214 @@
+:root {
+    /* Renk Paleti (Synthwave / Koyu) */
+    --bg-color: #050508;
+    --surface: rgba(22, 22, 30, 0.7);
+    --surface-border: rgba(255, 255, 255, 0.08);
+    
+    /* Vurgu Renkleri */
+    --accent-purple: #9d4edd;
+    --accent-pink: #ff1053;
+    --accent-orange: #ff7b00;
+    
+    --text-main: #a9a9b3;
+    --text-white: #ffffff;
+    --danger: #ff4b4b;
+    --cell-bg: rgba(255,255,255,0.015);
+    --cell-hover: rgba(255,255,255,0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(157, 78, 221, 0.1), transparent 25%),
+        radial-gradient(circle at 90% 80%, rgba(255, 16, 83, 0.08), transparent 25%);
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+.glass-container {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--surface-border);
+    border-radius: 20px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+}
+
+.active { display: block; }
+.hidden { display: none !important; }
+
+/* Dashboard Düzeni */
+.dashboard-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+@media (min-width: 800px) {
+    .dashboard-layout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .dashboard-layout.active {
+        display: flex;
+    }
+    .left-panel {
+        flex: 1;
+        min-width: 320px;
+        max-width: 350px;
+        position: sticky;
+        top: 20px;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .right-panel {
+        flex: 2;
+    }
+}
+
+/* Sol Panel Scrollbar */
+.left-panel::-webkit-scrollbar { width: 4px; }
+.left-panel::-webkit-scrollbar-track { background: transparent; }
+.left-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+.left-panel, .right-panel {
+    padding: 30px;
+}
+
+#welcome-screen {
+    width: 100%;
+    padding: 40px;
+}
+
+/* Header & Logo */
+header { text-align: center; }
+.logo { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.neon-dot {
+    width: 12px; height: 12px; 
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+    border-radius: 50%; 
+    box-shadow: 0 0 15px var(--accent-pink);
+}
+h1 { font-size: 26px; font-weight: 800; color: var(--text-white); letter-spacing: -0.5px; }
+.subtitle { font-size: 13px; color: var(--text-main); margin-top: 5px; letter-spacing: 1px; text-transform: uppercase; font-weight:600;}
+
+/* Forms & Buttons */
+form { display: flex; flex-direction: column; gap: 12px; }
+.input-group input {
+    width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--surface-border);
+    padding: 12px 16px; border-radius: 12px; color: var(--text-white);
+    font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s ease;
+}
+.input-group input:focus { 
+    outline: none; 
+    border-color: var(--accent-purple); 
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.2); 
+}
+.input-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.gradient-btn {
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+    border: none; color: var(--text-white);
+    padding: 14px; border-radius: 12px; font-family: 'Outfit', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 16, 83, 0.2);
+}
+.gradient-btn:hover { 
+    box-shadow: 0 6px 20px rgba(255, 16, 83, 0.4); 
+    transform: translateY(-2px);
+}
+
+.text-btn {
+    background: transparent; border: none; color: var(--accent-orange);
+    font-family: inherit; font-size: 12px; cursor: pointer; margin-left: 10px;
+    font-weight: 600;
+}
+.text-btn:hover { text-decoration: underline; }
+
+/* Upcoming List */
+.list-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+.list-item:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(157, 78, 221, 0.3);
+}
+.list-info {
+    display: flex; flex-direction: column; gap: 2px;
+}
+.list-name { font-size: 14px; font-weight: 600; color: var(--text-white); }
+.list-date { font-size: 12px; color: var(--accent-orange); }
+
+/* Calendar */
+.calendar-controls {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
+}
+.icon-btn {
+    background: transparent; border: 1px solid var(--surface-border); color: var(--text-white);
+    font-size: 24px; line-height: 1; width: 36px; height: 36px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover { border-color: var(--accent-purple); background: rgba(157, 78, 221, 0.1); }
+
+#month-year-display { font-size: 22px; font-weight: 600; color: var(--text-white); }
+
+.calendar { width: 100%; }
+.weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr); text-align: center;
+    font-weight: 600; font-size: 13px; color: var(--text-main); margin-bottom: 12px;
+}
+.days-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+}
+.day-cell {
+    background: var(--cell-bg); border: 1px solid var(--surface-border);
+    border-radius: 8px; min-height: 85px; padding: 5px; display: flex;
+    flex-direction: column; transition: all 0.2s ease;
+}
+.day-cell:hover { background: var(--cell-hover); }
+.day-cell.empty { background: transparent; border: none; }
+
+.date-num { 
+    font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.4); 
+    align-self: flex-end; margin-bottom: 5px; 
+}
+.day-cell.today { border-color: var(--accent-purple); background: rgba(157, 78, 221, 0.05); }
+.day-cell.today .date-num { color: var(--accent-purple); }
+
+/* Dynamic Colored Birthday Pills in Calendar */
+.bday-pill {
+    color: var(--bg-color); font-size: 11px; font-weight: 700; padding: 4px 6px;
+    border-radius: 4px; margin-bottom: 4px; white-space: normal; word-wrap: break-word; line-height: 1.2;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.pill-del-btn {
+    background: rgba(0,0,0,0.1); border: none; color: inherit; font-size: 13px;
+    width: 16px; height: 16px; border-radius: 50%;
+    line-height: 1; cursor: pointer; display: none; align-items:center; justify-content:center;
+}
+.bday-pill:hover .pill-del-btn { display: flex; background: rgba(0,0,0,0.3); }

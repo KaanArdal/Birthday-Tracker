@@ -1,0 +1,20 @@
+# Ortam Değişkenleri ve Gizli Dosyalar
+.env
+
+# Veritabanı (İçinde şifrelenmiş olsa bile kullanıcı bilgileri var)
+data.json
+
+# Python Önbellek Dosyaları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# IDE/OS Dosyaları
+.vscode/
+.DS_Store
+Thumbs.db
