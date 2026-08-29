@@ -24,6 +24,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const bdayName = document.getElementById('name');
     const bdayDate = document.getElementById('date');
     const upcomingList = document.getElementById('upcoming-list');
+    
+    // New Event Type Elements
+    const eventTypeRadios = document.getElementsByName('eventType');
+    const specialDayAddon = document.getElementById('special-day-addon');
+
+    eventTypeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'special') {
+                bdayName.placeholder = "Örn: Kaan'ın Düğün Yıl Dönümü";
+                specialDayAddon.classList.remove('hidden');
+                bdayName.style.paddingRight = '55px';
+            } else {
+                bdayName.placeholder = "İsim";
+                specialDayAddon.classList.add('hidden');
+                bdayName.style.paddingRight = '12px';
+            }
+        });
+    });
 
     // Takvim Elemanları
     const grid = document.getElementById('calendar-grid');
@@ -231,11 +249,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function addBirthday(name, dateStr) {
+        let type = 'birthday';
+        for (const radio of eventTypeRadios) {
+            if (radio.checked) {
+                type = radio.value;
+                break;
+            }
+        }
+        
         try {
             const res = await fetch('/api/birthdays', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: currentUser, name, date: dateStr })
+                body: JSON.stringify({ email: currentUser, name, date: dateStr, type: type })
             });
             if (res.ok) {
                 bdayName.value = '';
@@ -303,12 +329,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateStr = b.nextDate.toLocaleDateString('tr-TR', options);
             let daysText = b.diffDays === 0 ? 'Bugün!' : (b.diffDays === 1 ? 'Yarın' : `${b.diffDays} gün kaldı`);
             
-            const zodiac = getZodiacSign(b.date);
-            const zodiacStr = zodiac ? `(${zodiac})` : "";
+            let zodiacStr = "";
+            let subText = "";
+            
+            if (b.type === 'special') {
+                subText = `(${b.age}. Yılı)`;
+            } else {
+                const zodiac = getZodiacSign(b.date);
+                zodiacStr = zodiac ? `(${zodiac})` : "";
+                subText = `(${b.age} yaşına girecek)`;
+            }
 
             li.innerHTML = `
                 <div class="list-info">
-                    <span class="list-name">${b.name} <span style="font-weight:400;">${zodiacStr}</span> <span style="font-size:11px; color:rgba(255,255,255,0.4);">(${b.age} yaşına girecek)</span></span>
+                    <span class="list-name">${b.name} <span style="font-weight:400;">${zodiacStr}</span> <span style="font-size:11px; color:rgba(255,255,255,0.4);">${subText}</span></span>
                     <span class="list-date">${dateStr} (${daysText})</span>
                 </div>
                 <button class="pill-del-btn" onclick="deleteBirthday(${b.id}, event)" style="display:flex; position:static;">&times;</button>
@@ -361,8 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const pill = document.createElement('div');
                 pill.className = 'bday-pill';
                 
-                const zodiac = getZodiacSign(b.date);
-                const zodiacStr = zodiac && !b.isHoliday ? `(${zodiac})` : "";
+                let zodiacStr = "";
+                if (b.type !== 'special') {
+                    const zodiac = getZodiacSign(b.date);
+                    zodiacStr = zodiac && !b.isHoliday ? `(${zodiac})` : "";
+                }
 
                 if (b.isHoliday) {
                     pill.style.backgroundColor = '#e63946';

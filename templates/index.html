@@ -82,10 +82,19 @@
             </header>
 
             <div class="form-container" style="margin-bottom: 25px;">
-                <h3 style="margin-bottom: 15px; color:var(--text-white); font-weight:600; font-size:16px;">Kişi Ekle</h3>
+                <h3 style="margin-bottom: 15px; color:var(--text-white); font-weight:600; font-size:16px;">Kayıt Ekle</h3>
                 <form id="birthday-form">
-                    <div class="input-group">
-                        <input type="text" id="name" placeholder="İsim" required autocomplete="off">
+                    <div class="radio-group" style="display:flex; gap:15px; margin-bottom:15px;">
+                        <label style="color:var(--text-main); font-size:13px; display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="radio" name="eventType" value="birthday" checked> 🎂 Doğum Günü
+                        </label>
+                        <label style="color:var(--text-main); font-size:13px; display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="radio" name="eventType" value="special"> 🗓️ Özel Gün
+                        </label>
+                    </div>
+                    <div class="input-group" id="name-input-container" style="position:relative; display:flex; align-items:center;">
+                        <input type="text" id="name" placeholder="İsim" required autocomplete="off" style="width:100%;">
+                        <span id="special-day-addon" class="hidden" style="position:absolute; right:15px; color:var(--text-main); font-size:14px; pointer-events:none; font-weight:600;">Günü</span>
                     </div>
                     <div class="input-group">
                         <input type="date" id="date" required>

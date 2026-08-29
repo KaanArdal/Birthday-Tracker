@@ -84,34 +84,55 @@ def check_birthdays():
         
         for person in todays_people:
             name = person['name']
+            event_type = person.get('type', 'birthday')
             
-            # Yaş hesaplama
+            # Yaş / Yıl hesaplama
             birth_year = int(person['date'].split('-')[0])
-            new_age = target_date.year - birth_year
+            years_passed = target_date.year - birth_year
             
-            # Burç tespiti
-            birth_month = int(person['date'].split('-')[1])
-            birth_day = int(person['date'].split('-')[2])
-            zodiac = get_zodiac_sign(birth_month, birth_day)
-            
-            if reminder_days == 0:
-                subject = f"🎉 Bugün {name}'nin Doğum Günü! ({new_age} Yaş)"
-                intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> bugün tam {new_age} yaşına girdi! 🎂"
+            if event_type == 'special':
+                if reminder_days == 0:
+                    subject = f"Bugün Özel Bir Gün: {name} Günü! ({years_passed}. Yılı)"
+                    intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> için bugün özel bir gün! Bugün tam {years_passed}. yılı. Kutlamayı unutma!"
+                else:
+                    days_text = f"{reminder_days} gün" if reminder_days != 7 else "1 hafta"
+                    subject = f"{name} Gününe {days_text} Kaldı!"
+                    intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> için büyük güne {days_text} kaldı ({target_month_day})! Bu sene {years_passed}. yılı olacak. Hazırlık yapmayı unutma."
+                
+                body = f"""
+                <html>
+                <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                    <h2 style="color: #9d4edd;">Birthday Tracker Bildirimi</h2>
+                    <p>Merhaba,</p>
+                    <p>{intro_text}</p>
+                    <p><strong>Özel Gün:</strong> {name} Günü</p>
+                </body>
+                </html>
+                """
             else:
-                days_text = f"{reminder_days} gün" if reminder_days != 7 else "1 hafta"
-                subject = f"⏳ {name}'nin Doğum Gününe {days_text} Kaldı!"
-                intro_text = f"Takvimine kaydettiğin <strong>{name}</strong>, {days_text} sonra ({target_month_day}) {new_age} yaşına giriyor! Hediye almayı unutma. 🎁"
-            
-            body = f"""
-            <html>
-            <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-                <h2 style="color: #9d4edd;">Birthday Tracker Bildirimi</h2>
-                <p>Merhaba,</p>
-                <p>{intro_text}</p>
-                <p><strong>Kişi:</strong> {name} ({zodiac})</p>
-            </body>
-            </html>
-            """
+                # Burç tespiti
+                birth_month = int(person['date'].split('-')[1])
+                birth_day = int(person['date'].split('-')[2])
+                zodiac = get_zodiac_sign(birth_month, birth_day)
+                
+                if reminder_days == 0:
+                    subject = f"🎉 Bugün {name}'nin Doğum Günü! ({years_passed} Yaş)"
+                    intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> bugün tam {years_passed} yaşına girdi! 🎂"
+                else:
+                    days_text = f"{reminder_days} gün" if reminder_days != 7 else "1 hafta"
+                    subject = f"⏳ {name}'nin Doğum Gününe {days_text} Kaldı!"
+                    intro_text = f"Takvimine kaydettiğin <strong>{name}</strong>, {days_text} sonra ({target_month_day}) {years_passed} yaşına giriyor! Hediye almayı unutma. 🎁"
+                
+                body = f"""
+                <html>
+                <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                    <h2 style="color: #9d4edd;">Birthday Tracker Bildirimi</h2>
+                    <p>Merhaba,</p>
+                    <p>{intro_text}</p>
+                    <p><strong>Kişi:</strong> {name} ({zodiac})</p>
+                </body>
+                </html>
+                """
             send_email(user_email, subject, body)
 
 # --- API UÇLARI (AUTH & VERİ) ---
@@ -191,6 +212,7 @@ def add_birthday():
     email = data.get('email')
     name = data.get('name')
     date = data.get('date')
+    event_type = data.get('type', 'birthday')
     
     if not email or not name or not date:
         return jsonify({"error": "Eksik bilgi"}), 400
@@ -204,7 +226,7 @@ def add_birthday():
     if birthdays:
         new_id = max([b['id'] for b in birthdays]) + 1
         
-    birthdays.append({"id": new_id, "name": name, "date": date})
+    birthdays.append({"id": new_id, "name": name, "date": date, "type": event_type})
     db[email]["birthdays"] = birthdays
     save_data(db)
     
