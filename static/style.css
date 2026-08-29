@@ -212,3 +212,26 @@ form { display: flex; flex-direction: column; gap: 12px; }
     line-height: 1; cursor: pointer; display: none; align-items:center; justify-content:center;
 }
 .bday-pill:hover .pill-del-btn { display: flex; background: rgba(0,0,0,0.3); }
+
+/* Mobil Optimizasyonu */
+@media (max-width: 799px) {
+    body { padding: 10px; }
+    .left-panel, .right-panel { padding: 15px; }
+    
+    .days-grid { gap: 3px; }
+    .day-cell { min-height: 60px; padding: 3px; }
+    .date-num { font-size: 11px; margin-bottom: 2px; }
+    .weekdays { font-size: 11px; margin-bottom: 8px; }
+    
+    .bday-pill {
+        font-size: 9px;
+        padding: 2px 3px;
+        margin-bottom: 2px;
+    }
+    
+    .calendar-controls { margin-bottom: 15px; }
+    #month-year-display { font-size: 18px; }
+    .icon-btn { width: 30px; height: 30px; font-size: 20px; }
+    
+    .logo h1 { font-size: 20px; }
+}
