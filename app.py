@@ -251,7 +251,30 @@ def add_birthday():
     db[email]["birthdays"] = birthdays
     save_data(db)
     
-    return jsonify({"message": "Eklendi"}), 201
+    return jsonify({"success": True})
+
+@app.route('/api/gift_suggestion', methods=['POST'])
+def api_gift_suggestion():
+    data = request.json
+    date_str = data.get('date')
+    event_type = data.get('type', 'birthday')
+    
+    if not date_str:
+        return jsonify({"error": "Tarih gerekli"}), 400
+        
+    birth_year = int(date_str.split('-')[0])
+    current_year = datetime.now().year
+    years_passed = current_year - birth_year
+    
+    if event_type == 'special':
+        zodiac = ""
+    else:
+        birth_month = int(date_str.split('-')[1])
+        birth_day = int(date_str.split('-')[2])
+        zodiac = get_zodiac_sign(birth_month, birth_day)
+        
+    gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
+    return jsonify({"gifts": gifts})
 
 @app.route('/api/birthdays/<email>/<int:id>', methods=['DELETE'])
 def delete_birthday(email, id):

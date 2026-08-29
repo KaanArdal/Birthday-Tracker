@@ -71,10 +71,10 @@
                     <div>Hesap: <span id="display-email" style="color:var(--text-white); font-weight:600;"></span></div>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <select id="global-reminder" style="background:rgba(0,0,0,0.5); color:var(--text-white); border:1px solid var(--surface-border); padding:4px 8px; border-radius:6px; font-family:inherit; font-size:12px; cursor:pointer; outline:none;">
-                            <option value="0">Bildirim: Aynı Gün</option>
-                            <option value="1">Bildirim: 1 Gün Önce</option>
-                            <option value="3">Bildirim: 3 Gün Önce</option>
-                            <option value="7">Bildirim: 1 Hafta Önce</option>
+                            <option value="0" style="background:#1a1a2e; color:#fff;">Bildirim: Aynı Gün</option>
+                            <option value="1" style="background:#1a1a2e; color:#fff;">Bildirim: 1 Gün Önce</option>
+                            <option value="3" style="background:#1a1a2e; color:#fff;">Bildirim: 3 Gün Önce</option>
+                            <option value="7" style="background:#1a1a2e; color:#fff;">Bildirim: 1 Hafta Önce</option>
                         </select>
                         <button id="logout-btn" class="text-btn" style="margin-left:auto;">Çıkış Yap</button>
                     </div>
@@ -101,11 +101,11 @@
                     </div>
                     <div class="input-group" style="margin-top: 10px;">
                         <select id="person-reminder" style="width:100%; background:rgba(0,0,0,0.3); color:var(--text-main); border:1px solid var(--surface-border); padding:10px; border-radius:8px; font-family:inherit; font-size:13px; outline:none;">
-                            <option value="global">Hatırlatıcı: Hesabın Varsayılanı</option>
-                            <option value="0">Aynı Gün Hatırlat</option>
-                            <option value="1">1 Gün Önce Hatırlat</option>
-                            <option value="3">3 Gün Önce Hatırlat</option>
-                            <option value="7">1 Hafta Önce Hatırlat</option>
+                            <option value="global" style="background:#1a1a2e; color:#fff;">Hatırlatıcı: Hesabın Varsayılanı</option>
+                            <option value="0" style="background:#1a1a2e; color:#fff;">Aynı Gün Hatırlat</option>
+                            <option value="1" style="background:#1a1a2e; color:#fff;">1 Gün Önce Hatırlat</option>
+                            <option value="3" style="background:#1a1a2e; color:#fff;">3 Gün Önce Hatırlat</option>
+                            <option value="7" style="background:#1a1a2e; color:#fff;">1 Hafta Önce Hatırlat</option>
                         </select>
                     </div>
                     <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 10px;">
@@ -143,6 +143,15 @@
             </div>
         </main>
 
+    </div>
+
+    <!-- Hediye Öneri Modalı -->
+    <div id="gift-modal" class="hidden" style="position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index: 9999; backdrop-filter: blur(5px);">
+        <div class="glass-container" style="max-width: 450px; padding: 30px; position:relative;">
+            <span id="close-gift-modal" style="position:absolute; top: 15px; right: 20px; font-size:24px; cursor:pointer; color:var(--text-main);">&times;</span>
+            <h3 style="color: #9d4edd; margin-bottom: 20px; font-size: 18px;">🎁 Hediye Önerileri</h3>
+            <div id="gift-modal-text" style="color:var(--text-white); font-size:14px; line-height: 1.6;"></div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>

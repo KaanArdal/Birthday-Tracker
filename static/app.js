@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.deleteBirthday = async (id, e) => {
-        e.stopPropagation();
+        if(e) e.stopPropagation();
         if(typeof id === 'string' && id.startsWith('h')) return;
         
         try {
@@ -294,6 +294,36 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         addBirthday(bdayName.value, bdayDate.value);
     });
+
+    const giftModal = document.getElementById('gift-modal');
+    const closeGiftModal = document.getElementById('close-gift-modal');
+    const giftModalText = document.getElementById('gift-modal-text');
+
+    if (closeGiftModal) {
+        closeGiftModal.addEventListener('click', () => {
+            giftModal.classList.add('hidden');
+            giftModal.style.display = 'none';
+        });
+    }
+
+    async function getGiftSuggestionUI(person) {
+        giftModal.classList.remove('hidden');
+        giftModal.style.display = 'flex';
+        giftModalText.innerHTML = "<em>Akıllı algoritma çalışıyor...</em>";
+        try {
+            const res = await fetch('/api/gift_suggestion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: person.date, type: person.type })
+            });
+            const data = await res.json();
+            if (data.gifts) {
+                giftModalText.innerHTML = "<ul style='padding-left:20px;'>" + data.gifts.map(g => `<li style="margin-bottom:10px;">${g}</li>`).join('') + "</ul>";
+            }
+        } catch (e) {
+            giftModalText.innerHTML = "Hata oluştu.";
+        }
+    }
 
     // --- LİSTE MANTIĞI ---
     function renderUpcomingList() {
@@ -344,13 +374,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 subText = `(${b.age} yaşına girecek)`;
             }
 
-            li.innerHTML = `
-                <div class="list-info">
-                    <span class="list-name">${b.name} <span style="font-weight:400;">${zodiacStr}</span> <span style="font-size:11px; color:rgba(255,255,255,0.4);">${subText}</span></span>
-                    <span class="list-date">${dateStr} (${daysText})</span>
-                </div>
-                <button class="pill-del-btn" onclick="deleteBirthday(${b.id}, event)" style="display:flex; position:static;">&times;</button>
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'list-info';
+            infoDiv.innerHTML = `
+                <span class="list-name">${b.name} <span style="font-weight:400;">${zodiacStr}</span> <span style="font-size:11px; color:rgba(255,255,255,0.4);">${subText}</span></span>
+                <span class="list-date">${dateStr} (${daysText})</span>
             `;
+
+            const actionDiv = document.createElement('div');
+            actionDiv.style.display = 'flex';
+            actionDiv.style.gap = '15px';
+            actionDiv.style.alignItems = 'center';
+            
+            const giftBtn = document.createElement('span');
+            giftBtn.innerHTML = '🎁';
+            giftBtn.style.cursor = 'pointer';
+            giftBtn.style.fontSize = '16px';
+            giftBtn.title = 'Hediye Önerisi Al';
+            giftBtn.onclick = () => getGiftSuggestionUI(b);
+
+            const deleteBtn = document.createElement('span');
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.style.fontSize = '18px';
+            deleteBtn.onclick = (e) => deleteBirthday(b.id, e);
+            
+            actionDiv.appendChild(giftBtn);
+            actionDiv.appendChild(deleteBtn);
+            
+            li.appendChild(infoDiv);
+            li.appendChild(actionDiv);
             upcomingList.appendChild(li);
         });
     }
