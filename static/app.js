@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     eventTypeRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'special') {
-                bdayName.placeholder = "Örn: Kaan'ın Düğün Yıl Dönümü";
+                bdayName.placeholder = "Örn: Evlilik Yıl Dönümü";
                 specialDayAddon.classList.remove('hidden');
                 bdayName.style.paddingRight = '55px';
             } else {
