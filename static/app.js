@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/gift_suggestion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: person.date, type: person.type })
+                body: JSON.stringify({ email: currentUser, id: person.id, date: person.date, type: person.type })
             });
             const data = await res.json();
             if (data.gifts) {

@@ -72,6 +72,7 @@ def get_zodiac_sign(month, day):
 def check_birthdays():
     today = datetime.now()
     db = load_data()
+    data_changed = False
     
     for user_email, user_data in db.items():
         global_reminder = user_data.get("reminder", 0) # 0, 1, 3 veya 7 olabilir
@@ -103,7 +104,13 @@ def check_birthdays():
             zodiac = get_zodiac_sign(birth_month, birth_day)
             
             # Akıllı Hediye Önerileri
-            gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
+            if "gifts" in person and isinstance(person["gifts"], list) and len(person["gifts"]) > 0:
+                gifts = person["gifts"]
+            else:
+                gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
+                person["gifts"] = gifts
+                data_changed = True
+                
             gifts_html = "<ul>" + "".join([f"<li style='margin-bottom: 5px;'>{g}</li>" for g in gifts]) + "</ul>"
             
             gift_box_html = f"""
@@ -154,6 +161,9 @@ def check_birthdays():
                 </html>
                 """
             send_email(user_email, subject, body)
+            
+    if data_changed:
+        save_data(db)
 
 # --- API UÇLARI (AUTH & VERİ) ---
 @app.route('/')
@@ -256,25 +266,42 @@ def add_birthday():
 @app.route('/api/gift_suggestion', methods=['POST'])
 def api_gift_suggestion():
     data = request.json
+    email = data.get('email')
+    person_id = data.get('id')
     date_str = data.get('date')
     event_type = data.get('type', 'birthday')
     
-    if not date_str:
-        return jsonify({"error": "Tarih gerekli"}), 400
+    if not email or not person_id or not date_str:
+        return jsonify({"error": "Eksik bilgi"}), 400
         
-    birth_year = int(date_str.split('-')[0])
-    current_year = datetime.now().year
-    years_passed = current_year - birth_year
+    db = load_data()
+    if email not in db:
+        return jsonify({"error": "Kullanıcı yok"}), 404
+        
+    birthdays = db[email].get("birthdays", [])
     
-    if event_type == 'special':
-        zodiac = ""
-    else:
-        birth_month = int(date_str.split('-')[1])
-        birth_day = int(date_str.split('-')[2])
-        zodiac = get_zodiac_sign(birth_month, birth_day)
-        
-    gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
-    return jsonify({"gifts": gifts})
+    for person in birthdays:
+        if person['id'] == person_id:
+            if "gifts" in person and isinstance(person["gifts"], list) and len(person["gifts"]) > 0:
+                return jsonify({"gifts": person["gifts"]})
+                
+            birth_year = int(date_str.split('-')[0])
+            current_year = datetime.now().year
+            years_passed = current_year - birth_year
+            
+            if event_type == 'special':
+                zodiac = ""
+            else:
+                birth_month = int(date_str.split('-')[1])
+                birth_day = int(date_str.split('-')[2])
+                zodiac = get_zodiac_sign(birth_month, birth_day)
+                
+            gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
+            person["gifts"] = gifts
+            save_data(db)
+            return jsonify({"gifts": gifts})
+            
+    return jsonify({"error": "Kişi bulunamadı"}), 404
 
 @app.route('/api/birthdays/<email>/<int:id>', methods=['DELETE'])
 def delete_birthday(email, id):
