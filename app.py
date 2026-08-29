@@ -88,15 +88,28 @@ def check_birthdays():
             else:
                 reminder_days = int(person_reminder)
                 
-            target_date = today + timedelta(days=reminder_days)
-            target_month_day = f"{target_date.month:02d}-{target_date.day:02d}"
+            today_month_day = f"{today.month:02d}-{today.day:02d}"
+            is_birthday_today = person['date'].endswith(today_month_day)
             
-            if not person['date'].endswith(target_month_day):
+            is_reminder_today = False
+            if reminder_days > 0:
+                target_date = today + timedelta(days=reminder_days)
+                target_month_day = f"{target_date.month:02d}-{target_date.day:02d}"
+                is_reminder_today = person['date'].endswith(target_month_day)
+                
+            if not is_birthday_today and not is_reminder_today:
                 continue
+                
+            if is_birthday_today:
+                event_target_date = today
+                days_left = 0
+            else:
+                event_target_date = today + timedelta(days=reminder_days)
+                days_left = reminder_days
             
             # Yaş / Yıl hesaplama
             birth_year = int(person['date'].split('-')[0])
-            years_passed = target_date.year - birth_year
+            years_passed = event_target_date.year - birth_year
             
             # Burç tespiti
             birth_month = int(person['date'].split('-')[1])
@@ -121,11 +134,11 @@ def check_birthdays():
             """
             
             if event_type == 'special':
-                if reminder_days == 0:
+                if days_left == 0:
                     subject = f"Bugün Özel Bir Gün: {name} Günü! ({years_passed}. Yılı)"
                     intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> için bugün özel bir gün! Bugün tam {years_passed}. yılı. Kutlamayı unutma!"
                 else:
-                    days_text = f"{reminder_days} gün" if reminder_days != 7 else "1 hafta"
+                    days_text = f"{days_left} gün" if days_left != 7 else "1 hafta"
                     subject = f"{name} Gününe {days_text} Kaldı!"
                     intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> için büyük güne {days_text} kaldı ({target_month_day})! Bu sene {years_passed}. yılı olacak. Hazırlık yapmayı unutma."
                 
@@ -141,11 +154,11 @@ def check_birthdays():
                 </html>
                 """
             else:
-                if reminder_days == 0:
+                if days_left == 0:
                     subject = f"🎉 Bugün {name}'nin Doğum Günü! ({years_passed} Yaş)"
                     intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> bugün tam {years_passed} yaşına girdi! 🎂"
                 else:
-                    days_text = f"{reminder_days} gün" if reminder_days != 7 else "1 hafta"
+                    days_text = f"{days_left} gün" if days_left != 7 else "1 hafta"
                     subject = f"⏳ {name}'nin Doğum Gününe {days_text} Kaldı!"
                     intro_text = f"Takvimine kaydettiğin <strong>{name}</strong>, {days_text} sonra ({target_month_day}) {years_passed} yaşına giriyor! Hediye almayı unutma. 🎁"
                 
