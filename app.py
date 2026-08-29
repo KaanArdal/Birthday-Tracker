@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+from gift_engine import get_gift_suggestions
 
 load_dotenv()
 
@@ -73,22 +74,44 @@ def check_birthdays():
     db = load_data()
     
     for user_email, user_data in db.items():
-        reminder_days = user_data.get("reminder", 0) # 0, 1, 3 veya 7 olabilir
-        
-        # O kullanıcının aradığı hedef tarih (Örn: Bugün ayın 10'u, reminder 7 ise, o kişinin hedef tarihi ayın 17'sidir)
-        target_date = today + timedelta(days=reminder_days)
-        target_month_day = f"{target_date.month:02d}-{target_date.day:02d}"
-        
+        global_reminder = user_data.get("reminder", 0) # 0, 1, 3 veya 7 olabilir
         birthdays = user_data.get("birthdays", [])
-        todays_people = [person for person in birthdays if person['date'].endswith(target_month_day)]
         
-        for person in todays_people:
+        for person in birthdays:
             name = person['name']
             event_type = person.get('type', 'birthday')
+            person_reminder = person.get('reminder', 'global')
+            
+            if person_reminder == 'global':
+                reminder_days = int(global_reminder)
+            else:
+                reminder_days = int(person_reminder)
+                
+            target_date = today + timedelta(days=reminder_days)
+            target_month_day = f"{target_date.month:02d}-{target_date.day:02d}"
+            
+            if not person['date'].endswith(target_month_day):
+                continue
             
             # Yaş / Yıl hesaplama
             birth_year = int(person['date'].split('-')[0])
             years_passed = target_date.year - birth_year
+            
+            # Burç tespiti
+            birth_month = int(person['date'].split('-')[1])
+            birth_day = int(person['date'].split('-')[2])
+            zodiac = get_zodiac_sign(birth_month, birth_day)
+            
+            # Akıllı Hediye Önerileri
+            gifts = get_gift_suggestions(years_passed if event_type == 'birthday' else 30, zodiac, event_type)
+            gifts_html = "<ul>" + "".join([f"<li style='margin-bottom: 5px;'>{g}</li>" for g in gifts]) + "</ul>"
+            
+            gift_box_html = f"""
+            <div style="background-color: #f8f9fa; border-left: 4px solid #9d4edd; padding: 15px; margin-top: 20px; border-radius: 4px;">
+                <h3 style="margin-top: 0; color: #9d4edd; font-size: 16px; margin-bottom: 10px;">🎁 Bizden Size Hediye Önerileri</h3>
+                {gifts_html}
+            </div>
+            """
             
             if event_type == 'special':
                 if reminder_days == 0:
@@ -106,15 +129,11 @@ def check_birthdays():
                     <p>Merhaba,</p>
                     <p>{intro_text}</p>
                     <p><strong>Özel Gün:</strong> {name} Günü</p>
+                    {gift_box_html}
                 </body>
                 </html>
                 """
             else:
-                # Burç tespiti
-                birth_month = int(person['date'].split('-')[1])
-                birth_day = int(person['date'].split('-')[2])
-                zodiac = get_zodiac_sign(birth_month, birth_day)
-                
                 if reminder_days == 0:
                     subject = f"🎉 Bugün {name}'nin Doğum Günü! ({years_passed} Yaş)"
                     intro_text = f"Takvimine kaydettiğin <strong>{name}</strong> bugün tam {years_passed} yaşına girdi! 🎂"
@@ -130,6 +149,7 @@ def check_birthdays():
                     <p>Merhaba,</p>
                     <p>{intro_text}</p>
                     <p><strong>Kişi:</strong> {name} ({zodiac})</p>
+                    {gift_box_html}
                 </body>
                 </html>
                 """
@@ -213,6 +233,7 @@ def add_birthday():
     name = data.get('name')
     date = data.get('date')
     event_type = data.get('type', 'birthday')
+    reminder = data.get('reminder', 'global')
     
     if not email or not name or not date:
         return jsonify({"error": "Eksik bilgi"}), 400
@@ -226,7 +247,7 @@ def add_birthday():
     if birthdays:
         new_id = max([b['id'] for b in birthdays]) + 1
         
-    birthdays.append({"id": new_id, "name": name, "date": date, "type": event_type})
+    birthdays.append({"id": new_id, "name": name, "date": date, "type": event_type, "reminder": reminder})
     db[email]["birthdays"] = birthdays
     save_data(db)
     

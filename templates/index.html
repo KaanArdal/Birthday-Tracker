@@ -99,7 +99,16 @@
                     <div class="input-group">
                         <input type="date" id="date" required>
                     </div>
-                    <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 5px;">
+                    <div class="input-group" style="margin-top: 10px;">
+                        <select id="person-reminder" style="width:100%; background:rgba(0,0,0,0.3); color:var(--text-main); border:1px solid var(--surface-border); padding:10px; border-radius:8px; font-family:inherit; font-size:13px; outline:none;">
+                            <option value="global">Hatırlatıcı: Hesabın Varsayılanı</option>
+                            <option value="0">Aynı Gün Hatırlat</option>
+                            <option value="1">1 Gün Önce Hatırlat</option>
+                            <option value="3">3 Gün Önce Hatırlat</option>
+                            <option value="7">1 Hafta Önce Hatırlat</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 10px;">
                         <span>Kaydet</span>
                     </button>
                 </form>

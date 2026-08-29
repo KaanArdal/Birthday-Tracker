@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const birthdayForm = document.getElementById('birthday-form');
     const bdayName = document.getElementById('name');
     const bdayDate = document.getElementById('date');
+    const personReminder = document.getElementById('person-reminder');
     const upcomingList = document.getElementById('upcoming-list');
     
     // New Event Type Elements
@@ -257,14 +258,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
+        const reminderVal = personReminder.value;
+        
         try {
             const res = await fetch('/api/birthdays', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: currentUser, name, date: dateStr, type: type })
+                body: JSON.stringify({ email: currentUser, name, date: dateStr, type: type, reminder: reminderVal })
             });
             if (res.ok) {
                 bdayName.value = '';
+                personReminder.value = 'global';
                 fetchBirthdays(); 
             }
         } catch (error) {
