@@ -3,7 +3,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # .env dosyasını oku
@@ -41,12 +41,13 @@ def send_email(receiver_email, subject, body):
         server.login(sender, password)
         server.sendmail(sender, receiver_email, msg.as_string())
         server.quit()
-        print(f"[{datetime.now()}] {receiver_email} adresine mail başarıyla gönderildi.")
+        print(f"[{datetime.utcnow() + timedelta(hours=3)}] {receiver_email} adresine mail başarıyla gönderildi.")
     except Exception as e:
         print(f"Mail gönderme hatası ({receiver_email}): {e}")
 
 def check_birthdays():
-    today = datetime.now()
+    # PythonAnywhere UTC kullanır, Türkiye saati için UTC+3 ekliyoruz
+    today = datetime.utcnow() + timedelta(hours=3)
     month_day = f"{today.month:02d}-{today.day:02d}"
     db = load_birthdays()
     

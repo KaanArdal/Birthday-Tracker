@@ -70,7 +70,8 @@ def get_zodiac_sign(month, day):
     return ""
 
 def check_birthdays():
-    today = datetime.now()
+    # PythonAnywhere UTC kullanır, bu yüzden Türkiye saati (UTC+3) kullanıyoruz
+    today = datetime.utcnow() + timedelta(hours=3)
     db = load_data()
     data_changed = False
     
